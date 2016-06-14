@@ -2,8 +2,8 @@
 
 function dotProject(_name, _kind, _defines)
 
-	project ("dOt" .. _name)
-		uuid (os.uuid("dOt" .. _name))
+	project ("dot" .. _name)
+		uuid (os.uuid("dot" .. _name))
 		kind (_kind)
 
 		includedirs {

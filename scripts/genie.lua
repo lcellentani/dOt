@@ -14,7 +14,7 @@ solution "dOt"
 	}
 
 	language "C++"
---	startproject "e00-helloworld"
+	startproject "e00-helloworld"
 
 MODULE_DIR = path.getabsolute("../")
 DOT_DIR = path.getabsolute("..")
@@ -38,23 +38,23 @@ function exampleProject(_name, _basedir)
 
 	configuration {}
 
-	debugdir (path.join(DOT_DIR, "samples/runtime"))
+	debugdir (path.join(DOT_DIR, "sources/samples/runtime"))
 
 	includedirs {
 		path.join(DOT_DIR, "3rdparty/glloadgen"),
 		path.join(DOT_DIR, "3rdparty/glfw/include"),
-		path.join(DOT_DIR, "3rdparty/glm"),
-		path.join(DOT_DIR, "src"),
+--		path.join(DOT_DIR, "3rdparty/glm"),
+		path.join(DOT_DIR, "sources/framework"),
 	}
 
 	files {
-		path.join(DOT_DIR, "samples/", _basedir, _name, "**.c"),
-		path.join(DOT_DIR, "samples/", _basedir, _name, "**.cpp"),
-		path.join(DOT_DIR, "samples/", _basedir, _name, "**.h"),
+		path.join(DOT_DIR, "sources/samples/", _basedir, _name, "**.c"),
+		path.join(DOT_DIR, "sources/samples/", _basedir, _name, "**.cpp"),
+		path.join(DOT_DIR, "sources/samples/", _basedir, _name, "**.h"),
 	}
 
 	removefiles {
-		path.join(DOT_DIR, "samples/", _basedir, _name, "**.bin.h"),
+		path.join(DOT_DIR, "sources/samples/", _basedir, _name, "**.bin.h"),
 	}
 
 	links {
@@ -104,8 +104,8 @@ dofile "dot.lua"
 group "libs"
 dotProject("", "StaticLib", {})
 
---group "examples/GL"
---exampleProject("00-helloworld", "GL")
+group "examples/GL"
+exampleProject("00-helloworld", "GL")
 
 --group "examples/GLSL"
 --exampleProject("00-uniformblock", "GLSL")

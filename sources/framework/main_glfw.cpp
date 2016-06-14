@@ -1,5 +1,7 @@
 #include "main_p.h"
 
+#include "glfw/glfw3.h"
+
 namespace dot
 {
 
@@ -18,10 +20,24 @@ public:
 
 	int Run(int argc, char** argv)
 	{
+		if (!glfwInit())
+		{
+			return -1;
+		}
+
+		window = glfwCreateWindow(1280, 720, "dOt", NULL, NULL);
+		glfwMakeContextCurrent(window);
+
 		int result = main(argc, argv);
+
+		glfwDestroyWindow(window);
+		glfwTerminate();
 
 		return result;
 	}
+
+private:
+	GLFWwindow* window;
 };
 
 AppContext context;
