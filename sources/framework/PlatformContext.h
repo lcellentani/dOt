@@ -7,13 +7,22 @@ namespace core
 {
 
 class Application;
+class EventQueue;
 
 class PlatformContext
 {
 public:
-	virtual void PollEvents(Application * const app) = 0;
+	PlatformContext();
+	virtual ~PlatformContext();
 
-	virtual bool const IsExiting() const = 0;
+	virtual void PollEvents(Application * const app);
+
+	virtual bool const IsExiting() const;
+
+protected:
+	EventQueue *mEventQueue;
+
+	bool mExitRequest;
 };
 
 }

@@ -4,6 +4,9 @@
 #include "PlatformContext.h"
 #include "Application.h"
 
+#include "PlatformHandles.h"
+#include "PlatformEvent.h"
+
 #include <stdint.h> // uint32_t
 #include <windowsx.h>
 
@@ -26,55 +29,18 @@ struct MainThreadContext
 class Win32AppContext : public PlatformContext
 {
 public:
-	Win32AppContext()
-		: mAppContext(nullptr)
-		, mHwnd(0)
-		, mRect()
-		, mWindowWidth(0)
-		, mWindowHeight(0)
-		, mWidth(0)
-		, mHeight(0)
-		, mInit(false)
-		, mExit(false)
-		, mWindowed(true)
-		, mExitRequest(false)
+	Win32AppContext() : PlatformContext()
+	, mAppContext(nullptr)
+	, mHwnd(0)
+	, mRect()
+	, mWindowWidth(0)
+	, mWindowHeight(0)
+	, mWidth(0)
+	, mHeight(0)
+	, mInit(false)
+	, mExit(false)
+	, mWindowed(true)
 	{
-	}
-
-	virtual void PollEvents(Application * const app) OVERRIDE
-	{
-		const Event *evt = nullptr;
-		do
-		{
-			evt = mEventQueue.Poll();
-			if (evt != nullptr)
-			{
-				switch (evt->GetType())
-				{
-				case Event::Exit:
-					mExitRequest = true;
-					break;
-				case Event::Size:
-					{
-						const SizeEvent* sizeEvt = static_cast<const SizeEvent *>(evt);
-						if (app != nullptr)
-						{
-							app->Reshape(sizeEvt->mWidth, sizeEvt->mHeight);
-						}
-					}
-					break;
-				default:
-					break;
-				}
-
-				mEventQueue.Release(evt);
-			}
-		} while (evt != nullptr && !mExitRequest);
-	}
-
-	virtual bool const IsExiting() const OVERRIDE
-	{
-		return mExitRequest;
 	}
 
 	int Run(int argc, char** argv)
@@ -112,7 +78,7 @@ public:
 
 		mInit = true;
 
-		mEventQueue.PostSizeEvent(FindHandle(mHwnd), mWidth, mHeight);
+		mEventQueue->PostSizeEvent(FindHandle(mHwnd), mWidth, mHeight);
 
 		MSG msg;
 		msg.message = WM_NULL;
@@ -149,7 +115,7 @@ public:
 				if (hwnd == mHwnd)
 				{
 					mExit = true;
-					mEventQueue.PostExitEvent();
+					mEventQueue->PostExitEvent();
 				}
 				//else
 				//{
@@ -167,7 +133,7 @@ public:
 
 					mWidth = width;
 					mHeight = height;
-					mEventQueue.PostSizeEvent(handle, mWidth, mHeight);
+					mEventQueue->PostSizeEvent(handle, mWidth, mHeight);
 				}
 			}
 			break;
@@ -297,7 +263,6 @@ public:
 	AppContext *mAppContext;
 
 	Mutex mLock;
-	EventQueue mEventQueue;
 
 	HWND mHwnd;
 	RECT mRect;
@@ -312,9 +277,6 @@ public:
 	bool mInit;
 	bool mExit;
 	bool mWindowed;
-
-	bool mExitRequest;
-
 };
 
 //=====================================================================================================================
