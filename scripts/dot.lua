@@ -8,9 +8,7 @@ function dotProject(_name, _kind, _defines)
 
 		includedirs {
 			path.join(DOT_DIR, "3rdparty"),
-			path.join(DOT_DIR, "3rdparty/glloadgen"),
-			path.join(DOT_DIR, "3rdparty/glfw/include"),
---			path.join(DOT_DIR, "3rdparty/glm"),
+			path.join(DOT_DIR, "3rdparty/khronos"),
 		}
 
 		defines {
@@ -21,15 +19,12 @@ function dotProject(_name, _kind, _defines)
 
 		includedirs {
 			path.join(DOT_DIR, "include"),
-			path.join(DOT_DIR, "3rdparty/glloadgen"),
 		}
 
 		files {
 			path.join(DOT_DIR, "include/**.h"),
 			path.join(DOT_DIR, "sources/framework/**.cpp"),
 			path.join(DOT_DIR, "sources/framework/**.h"),
-			path.join(DOT_DIR, "3rdparty/glloadgen/**.c"),
-			path.join(DOT_DIR, "3rdparty/glloadgen/**.h"),
 		}
 
 		removefiles {

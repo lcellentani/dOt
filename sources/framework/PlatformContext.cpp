@@ -1,13 +1,16 @@
 #include "PlatformContext.h"
 #include "PlatformEvent.h"
 #include "Application.h"
+#include "Renderer.h"
+
+using namespace dot::rendering;
 
 namespace dot
 {
 namespace core
 {
 
-PlatformContext::PlatformContext() : mEventQueue(new EventQueue()), mExitRequest(false)
+PlatformContext::PlatformContext() : mEventQueue(new EventQueue()), mExitRequest(false), renderer(nullptr)
 {
 
 }
@@ -55,6 +58,11 @@ void PlatformContext::PollEvents(Application * const app)
 bool const PlatformContext::IsExiting() const
 {
 	return mExitRequest;
+}
+
+bool PlatformContext::CreateRenderer()
+{
+	renderer = Renderer::CreateRenderer(this);
 }
 
 } // namespace core
