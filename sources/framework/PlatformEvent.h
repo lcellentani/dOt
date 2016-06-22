@@ -21,7 +21,7 @@ public:
 		Count
 	};
 
-	Event(Type type) : mType(type), mHandle(UINT16_MAX) {}
+	Event(Type type) : mType(type), mHandle() {}
 
 	Event(Type type, WindowHandle handle) : mType(type), mHandle(handle) {}
 

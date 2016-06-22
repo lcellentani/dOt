@@ -14,6 +14,8 @@
 
 using namespace dot::core;
 
+static WindowHandle sDefaultWindow;
+
 static LRESULT CALLBACK WndProc(HWND hwnd, UINT id, WPARAM wparam, LPARAM lparam);
 
 struct MainThreadContext
@@ -78,7 +80,7 @@ public:
 
 		mInit = true;
 
-		mEventQueue->PostSizeEvent(FindHandle(mHwnd), mWidth, mHeight);
+		mEventQueue->PostSizeEvent(sDefaultWindow, mWidth, mHeight);
 
 		MSG msg;
 		msg.message = WM_NULL;
@@ -117,24 +119,16 @@ public:
 					mExit = true;
 					mEventQueue->PostExitEvent();
 				}
-				//else
-				//{
-				//	destroyWindow(findHandle(_hwnd));
-				//}
 				return 0;
 
 			case WM_SIZE:
 			{
-				WindowHandle handle = FindHandle(hwnd);
-				if (IsValid(handle))
-				{
-					uint32_t width = GET_X_LPARAM(lparam);
-					uint32_t height = GET_Y_LPARAM(lparam);
+				uint32_t width = GET_X_LPARAM(lparam);
+				uint32_t height = GET_Y_LPARAM(lparam);
 
-					mWidth = width;
-					mHeight = height;
-					mEventQueue->PostSizeEvent(handle, mWidth, mHeight);
-				}
+				mWidth = width;
+				mHeight = height;
+				mEventQueue->PostSizeEvent(sDefaultWindow, mWidth, mHeight);
 			}
 			break;
 
@@ -241,23 +235,6 @@ public:
 		HDC hdc = GetDC(hwnd);
 		SelectObject(hdc, brush);
 		FillRect(hdc, &rect, brush);
-	}
-
-	dot::core::WindowHandle FindHandle(HWND hwnd)
-	{
-		dot::core::MutexScope scope(mLock);
-		//for (uint16_t ii = 0, num = m_windowAlloc.getNumHandles(); ii < num; ++ii)
-		//{
-		//	uint16_t idx = m_windowAlloc.getHandleAt(ii);
-		//	if (_hwnd == m_hwnd[idx])
-		//	{
-		//		WindowHandle handle = { idx };
-		//		return handle;
-		//	}
-		//}
-
-		WindowHandle invalid = { 0/*UINT16_MAX*/ };
-		return invalid;
 	}
 
 	AppContext *mAppContext;

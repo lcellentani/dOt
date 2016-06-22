@@ -1,18 +1,18 @@
 #ifndef __DOT_PLATFORMHANDLES_H_HEADER_GUARD__
 #define __DOT_PLATFORMHANDLES_H_HEADER_GUARD__
 
+#include <stdint.h> // uint16_t
+
+#include "Handle.h"
+
 namespace dot
 {
 namespace core
 {
 
-struct WindowHandle
-{
-	WindowHandle(uint16_t idx) : mIdx(idx) {}
+struct tagWindowHandle {};
+typedef Handle<tagWindowHandle> WindowHandle;
 
-	uint16_t mIdx;
-};
-inline bool IsValid(WindowHandle handle) { return UINT16_MAX != handle.mIdx; }
 
 } // namespace core
 } // namespace dot
