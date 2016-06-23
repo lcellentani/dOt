@@ -10,7 +10,7 @@ namespace dot
 namespace core
 {
 
-PlatformContext::PlatformContext() : mEventQueue(new EventQueue()), mExitRequest(false), renderer(nullptr)
+PlatformContext::PlatformContext() : mEventQueue(new EventQueue()), mExitRequest(false), mRenderer(nullptr)
 {
 
 }
@@ -62,7 +62,13 @@ bool const PlatformContext::IsExiting() const
 
 bool PlatformContext::CreateRenderer()
 {
-	renderer = Renderer::CreateRenderer(this);
+	mRenderer = Renderer::CreateRenderer(this);
+	return true;
+}
+
+void PlatformContext::Flip()
+{
+	mRenderer->Flip();
 }
 
 } // namespace core

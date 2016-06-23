@@ -1,4 +1,7 @@
 #include "RendererGL.h"
+#include "RendererContextWGL.h"
+
+#include "Log.h"
 
 namespace dot
 {
@@ -6,6 +9,7 @@ namespace rendering
 {
 
 RendererGL::RendererGL() : Renderer()
+, mContextGL(nullptr)
 {
 
 }
@@ -27,13 +31,23 @@ const char * RendererGL::GetRendererName() const
 
 void RendererGL::Flip()
 {
-
+	mContextGL->Swap();
 }
 
-bool RendererGL::Init()
+bool RendererGL::Init(dot::core::PlatformContext * const platformContext)
 {
-	if (Renderer::Init())
+	if (Renderer::Init(platformContext))
 	{
+		mContextGL = new RendererContextWGL();
+		mContextGL->Create(platformContext);
+
+		int loaded = ogl_LoadFunctions();
+		if (loaded == ogl_LOAD_FAILED)
+		{
+			LOGE("Cannot load GL functions\n");
+			return false;
+		}
+
 		return true;
 	}
 

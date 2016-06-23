@@ -11,6 +11,8 @@ class AppContext
 public:
 	virtual const int GetWindowWidth() const = 0;
 	virtual const int GetWindowHeight() const = 0;
+
+	virtual const bool IsDebugModeEnabled() const = 0;
 };
 
 extern "C" AppContext * CreateAppContext();

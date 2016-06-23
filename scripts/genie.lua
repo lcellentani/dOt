@@ -42,8 +42,6 @@ function exampleProject(_name, _basedir)
 
 	includedirs {
 		path.join(DOT_DIR, "3rdparty/glloadgen"),
-		path.join(DOT_DIR, "3rdparty/glfw/include"),
---		path.join(DOT_DIR, "3rdparty/glm"),
 		path.join(DOT_DIR, "sources/framework"),
 	}
 

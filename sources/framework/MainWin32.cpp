@@ -28,6 +28,72 @@ struct MainThreadContext
 	static int32_t ThreadFunc(void *userData);
 };
 
+class Win32StopWatch : public StopWatch
+{
+public:
+	//! Constructor, default
+	Win32StopWatch() : StopWatch(), mStartTime(), mEndTime(), mDiffTime(0.0f), mFreq(0.0), mFreqSet(false)
+	{
+		if (!mFreqSet)
+		{
+			LARGE_INTEGER temp;
+
+			QueryPerformanceFrequency((LARGE_INTEGER*)&temp);
+			mFreq = ((double)temp.QuadPart);
+
+			mFreqSet = true;
+		}
+	};
+
+	virtual ~Win32StopWatch() {};
+
+	virtual void Start() OVERRIDE
+	{
+		QueryPerformanceCounter((LARGE_INTEGER*)&mStartTime);
+		mRunning = true;
+	}
+
+	virtual void Stop() OVERRIDE
+	{
+		QueryPerformanceCounter((LARGE_INTEGER*)&mEndTime);
+		mDiffTime = (float)(((double)mEndTime.QuadPart - (double)mStartTime.QuadPart) / mFreq);
+		mRunning = false;
+	}
+
+	virtual void Reset() OVERRIDE
+	{
+		mDiffTime = 0.0f;
+		if (mRunning)
+		{
+			QueryPerformanceCounter((LARGE_INTEGER*)&mStartTime);
+		}
+	}
+
+	const float GetTime() const
+	{
+		if (mRunning)
+		{
+			return getDiffTime();
+		}
+		return mDiffTime;
+	}
+
+private:
+	float getDiffTime() const
+	{
+		LARGE_INTEGER temp;
+		QueryPerformanceCounter((LARGE_INTEGER*)&temp);
+		return (float)(((double)temp.QuadPart - (double)mStartTime.QuadPart) / mFreq);
+	}
+
+	LARGE_INTEGER mStartTime;
+	LARGE_INTEGER mEndTime;
+	float mDiffTime;
+
+	double mFreq;
+	bool mFreqSet;
+};
+
 class Win32AppContext : public PlatformContext
 {
 public:
@@ -45,9 +111,16 @@ public:
 	{
 	}
 
+	virtual StopWatch * CreateStopWatch() OVERRIDE
+	{
+		return (StopWatch *) new Win32StopWatch();
+	}
+
 	int Run(int argc, char** argv)
 	{
 		mAppContext = CreateAppContext();
+
+		mDebugMode = mAppContext->IsDebugModeEnabled();
 
 		int defaultWidth = mAppContext->GetWindowWidth();
 		int defaultHeight = mAppContext->GetWindowHeight();
@@ -68,6 +141,7 @@ public:
 		RegisterClassExA(&wnd);
 
 		mHwnd = CreateWindowA("dOt", "dOt", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, defaultWidth, defaultHeight, NULL, NULL, instance, 0);
+		mNativeWindowHandle = (void *)mHwnd;
 
 		ReshapeWindow(mHwnd, defaultWidth, defaultHeight, true);
 		ClearWindow(mHwnd);
@@ -81,6 +155,8 @@ public:
 		mInit = true;
 
 		mEventQueue->PostSizeEvent(sDefaultWindow, mWidth, mHeight);
+		mFrameWidth = mWidth;
+		mFrameHeight = mHeight;
 
 		MSG msg;
 		msg.message = WM_NULL;
@@ -120,6 +196,53 @@ public:
 					mEventQueue->PostExitEvent();
 				}
 				return 0;
+
+			/*case WM_SIZING:
+			{
+				RECT& rect = *(RECT*)lparam;
+				uint32_t width = rect.right - rect.left - mFrameWidth;
+				uint32_t height = rect.bottom - rect.top - mFrameHeight;
+
+				// Recalculate size according to aspect ratio
+				switch (wparam)
+				{
+				case WMSZ_LEFT:
+				case WMSZ_RIGHT:
+				{
+					float aspectRatio = 1.0f / mAspectRatio;
+					//width = bx::uint32_max(ENTRY_DEFAULT_WIDTH / 4, width);
+					height = uint32_t(float(width)*aspectRatio);
+				}
+				break;
+
+				default:
+				{
+					float aspectRatio = mAspectRatio;
+					//height = bx::uint32_max(ENTRY_DEFAULT_HEIGHT / 4, height);
+					width = uint32_t(float(height)*aspectRatio);
+				}
+				break;
+				}
+
+				// Recalculate position using different anchor points
+				switch (wparam)
+				{
+				case WMSZ_LEFT:
+				case WMSZ_TOPLEFT:
+				case WMSZ_BOTTOMLEFT:
+					rect.left = rect.right - width - mFrameWidth;
+					rect.bottom = rect.top + height + mFrameHeight;
+					break;
+
+				default:
+					rect.right = rect.left + width + mFrameWidth;
+					rect.bottom = rect.top + height + mFrameHeight;
+					break;
+				}
+
+				mEventQueue->PostSizeEvent(sDefaultWindow, width, height);
+			}
+			return 0;*/
 
 			case WM_SIZE:
 			{

@@ -49,7 +49,7 @@ enum RendererType
 class Renderer
 {
 public:
-	static Renderer * CreateRenderer(dot::core::PlatformContext *platformContext);
+	static Renderer * CreateRenderer(dot::core::PlatformContext * const platformContext);
 
 public:
 	Renderer();
@@ -61,7 +61,7 @@ public:
 
 	virtual void Flip() = 0;
 
-	virtual bool Init();
+	virtual bool Init(dot::core::PlatformContext * const platformContext);
 };
 
 } // namespace rendering

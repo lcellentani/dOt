@@ -8,10 +8,10 @@ namespace dot
 namespace rendering
 {
 	
-Renderer * Renderer::CreateRenderer(dot::core::PlatformContext *platformContext)
+Renderer * Renderer::CreateRenderer(dot::core::PlatformContext * const platformContext)
 {
 	Renderer *newRenderer = new RendererGL();
-	newRenderer->Init();
+	newRenderer->Init(platformContext);
 
 	return newRenderer;
 }
@@ -24,7 +24,7 @@ Renderer::~Renderer()
 {
 }
 
-bool Renderer::Init()
+bool Renderer::Init(dot::core::PlatformContext * const platformContext)
 {
 	return true;
 }

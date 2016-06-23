@@ -1,6 +1,9 @@
 #ifndef __DOT_PLATFORMCONTEXT_H_HEADER_GUARD__
 #define __DOT_PLATFORMCONTEXT_H_HEADER_GUARD__
 
+#include <stdint.h> // uint32_t
+#include "StopWatch.h"
+
 namespace dot { namespace rendering { class Renderer; } }
 
 namespace dot
@@ -11,23 +14,39 @@ namespace core
 class Application;
 class EventQueue;
 
-class PlatformContext
+class PlatformContext : public StopWatchFactory
 {
 public:
 	PlatformContext();
 	virtual ~PlatformContext();
 
+	virtual StopWatch * CreateStopWatch() = 0;
+
 	virtual void PollEvents(Application * const app);
 	virtual bool const IsExiting() const;
 
 	bool CreateRenderer();
+	void Flip();
+
+	void * GetNativeWindowHandle() const { return mNativeWindowHandle; }
+
+	const uint32_t GetFrameWidth() const { return mFrameWidth; }
+	const uint32_t GetFrameHeight() const { return mFrameHeight; }
+
+	const bool IsDebugModeEnabled() const { return mDebugMode; }
 
 protected:
 	EventQueue *mEventQueue;
 
 	bool mExitRequest;
+	bool mDebugMode;
 
-	dot::rendering::Renderer * renderer;
+	uint32_t mFrameWidth;
+	uint32_t mFrameHeight;
+
+	void* mNativeWindowHandle;
+
+	dot::rendering::Renderer* mRenderer;
 };
 
 }

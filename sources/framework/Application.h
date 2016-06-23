@@ -2,6 +2,9 @@
 #define __DOT_APPLICATION_H_HEADER_GUARD__
 
 #include <stdint.h> // uint32_t
+#include "StopWatch.h"
+
+namespace dot { namespace core { class PlatformContext; } }
 
 namespace dot
 {
@@ -15,15 +18,20 @@ public:
 	Application();
 	virtual ~Application();
 
-	virtual void Initialize() = 0;
-	virtual void Update() = 0;
+	virtual void Initialize(dot::core::PlatformContext * const platformContext);
+	virtual void Update();
 	virtual void Render() = 0;
 	virtual int Shutdown() = 0;
 
 	virtual void Reshape(uint32_t width, uint32_t height) {}
 
-protected:
+	const float GetTime() const { return mTime; }
+	const float GetDeltaTime() const { return mDeltaTime; }
 
+protected:
+	StopWatch * mFrameTimer;
+	float mTime;
+	float mDeltaTime;
 };
 
 extern "C" Application * CreateApplication();

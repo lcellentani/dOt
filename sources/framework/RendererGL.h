@@ -2,15 +2,11 @@
 #define __DOT_RENDERERGL_H_HEADER_GUARD__
 
 #include "Renderer.h"
+#include "RendererGLConfig.h"
+
 #include "PlatformMacros.h"
 
-#if DOT_RENDERER_OPENGL
-#	if DOT_RENDERER_OPENGL_TARGET_VERSION >= 31
-#		include <gl/glcorearb.h>
-#	else
-#		include <gl/GL.h>
-#	endif
-#endif
+namespace dot { namespace rendering { class RendererContextWGL;  } }
 
 namespace dot
 {
@@ -29,7 +25,10 @@ public:
 
 	virtual void Flip() OVERRIDE;
 
-	virtual bool Init() OVERRIDE;
+	virtual bool Init(dot::core::PlatformContext * const platformContext) OVERRIDE;
+
+private:
+	RendererContextWGL *mContextGL;
 };
 
 } // namespace rendering
