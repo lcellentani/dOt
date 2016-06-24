@@ -1,8 +1,7 @@
 
 #include "dot.h"
-#include "Log.h"
 
-#include "RendererGLConfig.h"
+#include "rendering/RendererGLConfig.h"
 
 #include <math.h>
 
