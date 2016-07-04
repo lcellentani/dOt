@@ -31,6 +31,8 @@ int MainProxy(int argv, char ** argc, PlatformContext *platformContext)
 		renderer->Flip();
 	}
 
+	theApp->Shutdown();
+
 	return 0;
 }
 

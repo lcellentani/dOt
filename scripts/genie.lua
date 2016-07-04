@@ -42,13 +42,17 @@ function exampleProject(_name, _basedir)
 
 	includedirs {
 		path.join(DOT_DIR, "3rdparty/glloadgen"),
+		path.join(DOT_DIR, "3rdparty/glm"),
 		path.join(DOT_DIR, "sources/framework"),
+		path.join(DOT_DIR, "sources/samples/", _basedir),
 	}
 
 	files {
 		path.join(DOT_DIR, "sources/samples/", _basedir, _name, "**.c"),
 		path.join(DOT_DIR, "sources/samples/", _basedir, _name, "**.cpp"),
 		path.join(DOT_DIR, "sources/samples/", _basedir, _name, "**.h"),
+		path.join(DOT_DIR, "sources/samples/", _basedir, "common", "**.cpp"),
+		path.join(DOT_DIR, "sources/samples/", _basedir, "common", "**.h"),
 	}
 
 	removefiles {
@@ -104,6 +108,5 @@ dotProject("", "StaticLib", {})
 
 group "examples/GL"
 exampleProject("00-helloworld", "GL")
+exampleProject("01-uniformblock", "GL")
 
---group "examples/GLSL"
---exampleProject("00-uniformblock", "GLSL")
