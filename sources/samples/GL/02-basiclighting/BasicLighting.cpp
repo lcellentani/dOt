@@ -39,6 +39,17 @@ class BasicLighting : public dot::core::Application
 public:
 	BasicLighting() : Application(), mDiffuseProgram(), mTorus(nullptr), mAngleY(0.0f) {}
 
+	//@note: this is to prevent compiling warning C4316
+	void* operator new(size_t i)
+	{
+		return _mm_malloc(i, 16);
+	}
+	//@note: this is to prevent compiling warning C4316
+	void operator delete(void* p)
+	{
+		_mm_free(p);
+	}
+
 	virtual void Initialize(dot::core::PlatformContext * const platformContext) OVERRIDE
 	{
 		Application::Initialize(platformContext);
