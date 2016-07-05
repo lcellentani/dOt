@@ -14,11 +14,11 @@ namespace gl
 namespace samples
 {
 
-Torus::Torus(float outerRadius, float innerRadius, uint32_t nsides, uint32_t nrings) : Drawable(), rings(rings), sides(nsides)
+Torus::Torus(float outerRadius, float innerRadius, uint32_t nsides, uint32_t nrings) : Drawable(), mRings(nrings), mSides(nsides)
 {
-    faces = sides * rings;
+    mFaces = mSides * mRings;
 	// One extra ring to duplicate first ring
-    int nVerts  = sides * (rings + 1);
+    int nVerts  = mSides * (mRings + 1);
 
     // Verts
     float * v = new float[3 * nVerts];
@@ -27,7 +27,7 @@ Torus::Torus(float outerRadius, float innerRadius, uint32_t nsides, uint32_t nri
     // Tex coords
     float * tex = new float[2 * nVerts];
     // Elements
-    unsigned int * el = new unsigned int[6 * faces];
+    unsigned int * el = new unsigned int[6 * mFaces];
 
     // Generate the vertex data
     GenerateVerts(v, n, tex, el, outerRadius, innerRadius);
@@ -46,7 +46,7 @@ Torus::Torus(float outerRadius, float innerRadius, uint32_t nsides, uint32_t nri
     glBufferData(GL_ARRAY_BUFFER, (2 * nVerts) * sizeof(float), tex, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * faces * sizeof(unsigned int), el, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * mFaces * sizeof(unsigned int), el, GL_STATIC_DRAW);
 
     delete [] v;
     delete [] n;
@@ -54,8 +54,8 @@ Torus::Torus(float outerRadius, float innerRadius, uint32_t nsides, uint32_t nri
     delete [] tex;
 
     // Create the VAO
-    glGenVertexArrays(1, &vaoHandle);
-    glBindVertexArray(vaoHandle);
+    glGenVertexArrays(1, &mVaoHandle);
+    glBindVertexArray(mVaoHandle);
 
     glEnableVertexAttribArray(0);  // Vertex position
     glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
@@ -74,23 +74,32 @@ Torus::Torus(float outerRadius, float innerRadius, uint32_t nsides, uint32_t nri
     glBindVertexArray(0);
 }
 
+Torus::~Torus()
+{
+	if (mVaoHandle != 0)
+	{
+		glDeleteVertexArrays(1, &mVaoHandle);
+		mVaoHandle = 0;
+	}
+}
+
 void Torus::Render() const
 {
-    glBindVertexArray(vaoHandle);
-    glDrawElements(GL_TRIANGLES, 6 * faces, GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+    glBindVertexArray(mVaoHandle);
+    glDrawElements(GL_TRIANGLES, 6 * mFaces, GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
 }
 
 void Torus::GenerateVerts(float * verts, float * norms, float * tex, unsigned int * el, float outerRadius, float innerRadius)
 {
-	float ringFactor = glm::two_pi<float>() / rings;
-	float sideFactor = glm::two_pi<float>() / sides;
+	float ringFactor = glm::two_pi<float>() / mRings;
+	float sideFactor = glm::two_pi<float>() / mSides;
     int idx = 0, tidx = 0;
-	for (uint32_t ring = 0; ring <= rings; ring++)
+	for (uint32_t ring = 0; ring <= mRings; ring++)
 	{
 		float u = ring * ringFactor;
 		float cu = cos(u);
 		float su = sin(u);
-		for (uint32_t side = 0; side < sides; side++)
+		for (uint32_t side = 0; side < mSides; side++)
 		{
 			float v = side * sideFactor;
 			float cv = cos(v);
@@ -115,13 +124,13 @@ void Torus::GenerateVerts(float * verts, float * norms, float * tex, unsigned in
 	}
 
     idx = 0;
-	for (uint32_t ring = 0; ring < rings; ring++)
+	for (uint32_t ring = 0; ring < mRings; ring++)
 	{
-		int ringStart = ring * sides;
-		int nextRingStart = (ring + 1) * sides;
-		for (uint32_t side = 0; side < sides; side++)
+		int ringStart = ring * mSides;
+		int nextRingStart = (ring + 1) * mSides;
+		for (uint32_t side = 0; side < mSides; side++)
 		{
-			int nextSide = (side + 1) % sides;
+			int nextSide = (side + 1) % mSides;
 			// The quad
 			el[idx] = (ringStart + side);
 			el[idx + 1] = (nextRingStart + side);

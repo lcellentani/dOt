@@ -26,7 +26,7 @@ public:
 class UniformBlock : public dot::core::Application
 {
 public:
-	UniformBlock() : Application(), vao(0), prog() {}
+	UniformBlock() : Application(), mVao(0), mProg() {}
 
 	virtual void Initialize(dot::core::PlatformContext * const platformContext) OVERRIDE
 	{
@@ -52,17 +52,18 @@ public:
 		static const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		glClearBufferfv(GL_COLOR, 0, black);
 
-		glBindVertexArray(vao);
+		glBindVertexArray(mVao);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 
 	virtual int Shutdown() OVERRIDE
 	{
-		if (vao != 0)
+		if (mVao != 0)
 		{
-			glDeleteVertexArrays(1, &vao);
-			vao = 0;
+			glDeleteVertexArrays(1, &mVao);
+			mVao = 0;
 		}
+
 		return 0;
 	}
 
@@ -74,18 +75,18 @@ public:
 private:
 	void LoadShaders()
 	{
-		prog.CompileShaderFromFile("shaders/GL/uniformblock/basic_uniformblock.vert");
-		prog.CompileShaderFromFile("shaders/GL/uniformblock/basic_uniformblock.frag");
-		prog.Link();
-		prog.Use();
+		mProg.CompileShaderFromFile("shaders/GL/uniformblock/basic_uniformblock.vert");
+		mProg.CompileShaderFromFile("shaders/GL/uniformblock/basic_uniformblock.frag");
+		mProg.Link();
+		mProg.Use();
 
-		prog.PrintActiveUniforms();
-		prog.PrintActiveUniformBlocks();
+		mProg.PrintActiveUniforms();
+		mProg.PrintActiveUniformBlocks();
 	}
 
 	void InitUniformBlock()
 	{
-		GLuint programHandle = prog.GetHandle();
+		GLuint programHandle = mProg.GetHandle();
 
 		// Get the index of the uniform block
 		GLuint blockIndex = glGetUniformBlockIndex(programHandle, "BlobSettings");
@@ -165,8 +166,8 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), tcData, GL_STATIC_DRAW);
 
 		// Create and set-up the vertex array object
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
+		glGenVertexArrays(1, &mVao);
+		glBindVertexArray(mVao);
 
 		glEnableVertexAttribArray(0);  // Vertex position
 		glEnableVertexAttribArray(1);  // Vertex texture coords
@@ -179,8 +180,8 @@ private:
 	}
 
 private:
-	GLuint vao;
-	dot::gl::samples::GLSLProgram prog;
+	GLuint mVao;
+	dot::gl::samples::GLSLProgram mProg;
 };
 
 //=====================================================================================================================

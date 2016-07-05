@@ -137,4 +137,6 @@ group "examples/GL"
 examplesCommonProject("gl-examples-common", "GL")
 exampleProject("00-helloworld", "GL", "gl-examples-common")
 exampleProject("01-uniformblock", "GL", "gl-examples-common")
+exampleProject("02-basiclighting", "GL", "gl-examples-common")
+
 

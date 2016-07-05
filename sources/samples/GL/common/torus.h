@@ -20,16 +20,16 @@ public:
 
 	virtual void Render() const override;
 
-	int GetVertexArrayHandle() { return vaoHandle; }
+	int GetVertexArrayHandle() { return mVaoHandle; }
 
 private:
 	void GenerateVerts(float *, float *, float *, unsigned int *, float, float);
 
 private:
-	uint32_t vaoHandle;
-	uint32_t faces;
-	uint32_t rings;
-	uint32_t sides;
+	uint32_t mVaoHandle;
+	uint32_t mFaces;
+	uint32_t mRings;
+	uint32_t mSides;
 };
 
 } // samples
