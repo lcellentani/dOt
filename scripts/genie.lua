@@ -30,7 +30,7 @@ end
 function copyLib()
 end
 
-function exampleProject(_name, _basedir)
+function exampleProject(_name, _basedir, _commonProject)
 
 	project ("e" .. _name)
 		uuid (os.uuid("example-" .. _name))
@@ -51,8 +51,6 @@ function exampleProject(_name, _basedir)
 		path.join(DOT_DIR, "sources/samples/", _basedir, _name, "**.c"),
 		path.join(DOT_DIR, "sources/samples/", _basedir, _name, "**.cpp"),
 		path.join(DOT_DIR, "sources/samples/", _basedir, _name, "**.h"),
-		path.join(DOT_DIR, "sources/samples/", _basedir, "common", "**.cpp"),
-		path.join(DOT_DIR, "sources/samples/", _basedir, "common", "**.h"),
 	}
 
 	removefiles {
@@ -61,6 +59,7 @@ function exampleProject(_name, _basedir)
 
 	links {
 		"dot",
+		_commonProject
 	}
 	
 	configuration { "x32", "vs*" }
@@ -101,12 +100,41 @@ function exampleProject(_name, _basedir)
 	strip()
 end
 
+function examplesCommonProject(_name, _basedir)
+	project (_name)
+		uuid (os.uuid(_name))
+		kind "StaticLib"
+	
+	configuration {}	
+
+	includedirs {
+		path.join(DOT_DIR, "3rdparty/glloadgen"),
+		path.join(DOT_DIR, "3rdparty/glm"),
+		path.join(DOT_DIR, "sources/framework"),
+		path.join(DOT_DIR, "sources/samples/", _basedir),
+	}
+
+	files {
+		path.join(DOT_DIR, "sources/samples/", _basedir, "common", "**.cpp"),
+		path.join(DOT_DIR, "sources/samples/", _basedir, "common", "**.h"),
+	}
+
+	removefiles {
+		path.join(DOT_DIR, "sources/framework/**.bin.h"),
+	}
+
+	configuration {}
+
+	copyLib()
+end
+
 dofile "dot.lua"
 
 group "libs"
 dotProject("", "StaticLib", {})
 
 group "examples/GL"
-exampleProject("00-helloworld", "GL")
-exampleProject("01-uniformblock", "GL")
+examplesCommonProject("gl-examples-common", "GL")
+exampleProject("00-helloworld", "GL", "gl-examples-common")
+exampleProject("01-uniformblock", "GL", "gl-examples-common")
 
