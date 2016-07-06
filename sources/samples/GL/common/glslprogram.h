@@ -57,9 +57,9 @@ public:
 	void SetUniform(const char *name, bool val);
 	void SetUniform(const char *name, GLuint val);
 
-	void PrintActiveUniforms();
-	void PrintActiveUniformBlocks();
-	void PrintActiveAttribs();
+	void PrintActiveUniforms(const char * name = "unnamed");
+	void PrintActiveUniformBlocks(const char * name = "unnamed");
+	void PrintActiveAttribs(const char * name = "unnamed");
 
 	const char * GetTypeString(GLenum type);
 

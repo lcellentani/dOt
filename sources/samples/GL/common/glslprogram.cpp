@@ -309,7 +309,7 @@ void GLSLProgram::SetUniform(const char *name, GLuint val)
 	glUniform1ui(loc, val);
 }
 
-void GLSLProgram::PrintActiveUniforms()
+void GLSLProgram::PrintActiveUniforms(const char * name)
 {
 #ifdef __APPLE__
 	// For OpenGL 4.1, use glGetActiveUniform
@@ -350,7 +350,7 @@ void GLSLProgram::PrintActiveUniforms()
 
 	if (numUniforms > 0)
 	{
-		LOGI("Active uniforms:");
+		LOGI("[%s] Active uniforms:", name);
 		LOGI("------------------------------------------------");
 		for (int i = 0; i < numUniforms; ++i)
 		{
@@ -368,12 +368,12 @@ void GLSLProgram::PrintActiveUniforms()
 	}
 	else
 	{
-		LOGI("Active uniforms: NONE");
+		LOGI("[%s] Active uniforms: NONE", name);
 	}
 #endif
 }
 
-void GLSLProgram::PrintActiveUniformBlocks()
+void GLSLProgram::PrintActiveUniformBlocks(const char * name)
 {
 #ifdef __APPLE__
 	// For OpenGL 4.1, use glGetActiveUniformBlockiv
@@ -432,7 +432,7 @@ void GLSLProgram::PrintActiveUniformBlocks()
 
 	if (numBlocks > 0)
 	{
-		LOGI("Active Uniform blocks:");
+		LOGI("[%s] Active Uniform blocks:", name);
 		LOGI("------------------------------------------------");
 		for (int block = 0; block < numBlocks; ++block)
 		{
@@ -467,12 +467,12 @@ void GLSLProgram::PrintActiveUniformBlocks()
 	}
 	else
 	{
-		LOGI("Active Uniform blocks: NONE");
+		LOGI("[%s] Active Uniform blocks: NONE", name);
 	}
 #endif
 }
 
-void GLSLProgram::PrintActiveAttribs()
+void GLSLProgram::PrintActiveAttribs(const char * name)
 {
 #ifdef __APPLE__
 	// For OpenGL 4.1, use glGetActiveAttrib
@@ -501,20 +501,27 @@ void GLSLProgram::PrintActiveAttribs()
 
 	GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
 
-	LOGI("Active attributes:");
-	LOGI("------------------------------------------------\n");
-	for (int i = 0; i < numAttribs; ++i)
+	if (numAttribs > 0)
 	{
-		GLint results[3];
-		glGetProgramResourceiv(handle, GL_PROGRAM_INPUT, i, 3, properties, 3, NULL, results);
+		LOGI("[%s] Active attributes:", name);
+		LOGI("------------------------------------------------\n");
+		for (int i = 0; i < numAttribs; ++i)
+		{
+			GLint results[3];
+			glGetProgramResourceiv(handle, GL_PROGRAM_INPUT, i, 3, properties, 3, NULL, results);
 
-		GLint nameBufSize = results[0] + 1;
-		char * name = new char[nameBufSize];
-		glGetProgramResourceName(handle, GL_PROGRAM_INPUT, i, nameBufSize, NULL, name);
-		LOGI("%-5d %s (%s)", results[2], name, GetTypeString(results[1]));
-		delete[] name;
+			GLint nameBufSize = results[0] + 1;
+			char * name = new char[nameBufSize];
+			glGetProgramResourceName(handle, GL_PROGRAM_INPUT, i, nameBufSize, NULL, name);
+			LOGI("%-5d %s (%s)", results[2], name, GetTypeString(results[1]));
+			delete[] name;
+		}
+		LOGI("------------------------------------------------");
 	}
-	LOGI("------------------------------------------------");
+	else
+	{
+		LOGI("[%s] Active attributes: NONE", name);
+	}
 #endif
 }
 

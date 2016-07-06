@@ -40,6 +40,7 @@ public:
 	BasicLighting() : Application()
 	, mDiffuseProgram(nullptr)
 	, mPhongProgram(nullptr)
+	, mFlatProgram(nullptr)
 	, mActiveProgram(nullptr)
 	, mTorus(nullptr)
 	, mAngleY(0.0f)
@@ -66,6 +67,7 @@ public:
 
 		//mActiveProgram = mDiffuseProgram;
 		mActiveProgram = mPhongProgram;
+		//mActiveProgram = mFlatProgram;
 		mActiveProgram->Use();
 
 		glEnable(GL_DEPTH_TEST);
@@ -101,7 +103,11 @@ public:
 			delete mPhongProgram;
 			mPhongProgram = nullptr;
 		}
-
+		if (mFlatProgram != nullptr)
+		{
+			delete mFlatProgram;
+			mFlatProgram = nullptr;
+		}
 		return 0;
 	}
 
@@ -120,16 +126,24 @@ private:
 		mDiffuseProgram->CompileShaderFromFile("shaders/GL/basiclighting/diffuse.vert");
 		mDiffuseProgram->CompileShaderFromFile("shaders/GL/basiclighting/diffuse.frag");
 		mDiffuseProgram->Link();
-		mDiffuseProgram->PrintActiveUniforms();
-		mDiffuseProgram->PrintActiveUniformBlocks();
+		mDiffuseProgram->PrintActiveUniforms("diffuse");
+		mDiffuseProgram->PrintActiveUniformBlocks("diffuse");
 
 		// phong lighting shaders
 		mPhongProgram = new dot::gl::samples::GLSLProgram();
 		mPhongProgram->CompileShaderFromFile("shaders/GL/basiclighting/phong.vert");
 		mPhongProgram->CompileShaderFromFile("shaders/GL/basiclighting/phong.frag");
 		mPhongProgram->Link();
-		mPhongProgram->PrintActiveUniforms();
-		mPhongProgram->PrintActiveUniformBlocks();
+		mPhongProgram->PrintActiveUniforms("phong");
+		mPhongProgram->PrintActiveUniformBlocks("phong");
+
+		// flat lighting shaders
+		mFlatProgram = new dot::gl::samples::GLSLProgram();
+		mFlatProgram->CompileShaderFromFile("shaders/GL/basiclighting/flat.vert");
+		mFlatProgram->CompileShaderFromFile("shaders/GL/basiclighting/flat.frag");
+		mFlatProgram->Link();
+		mFlatProgram->PrintActiveUniforms("flat");
+		mFlatProgram->PrintActiveUniformBlocks("flat");
 	}
 
 	void InitScene()
@@ -143,6 +157,11 @@ private:
 
 	void UpdateUniforms()
 	{
+		if (mActiveProgram == nullptr)
+		{
+			return;
+		}
+
 		mAngleY += 20.0f * GetDeltaTime();
 		if (mAngleY > 360.0f)
 		{
@@ -172,6 +191,7 @@ private:
 private:
 	dot::gl::samples::GLSLProgram *mDiffuseProgram;
 	dot::gl::samples::GLSLProgram *mPhongProgram;
+	dot::gl::samples::GLSLProgram *mFlatProgram;
 	dot::gl::samples::GLSLProgram *mActiveProgram;
 
 	dot::gl::samples::Torus *mTorus;
