@@ -19,6 +19,8 @@ GLSLProgram::~GLSLProgram()
 {
 	if (handle != 0)
 	{
+		uniformLocations.clear();
+
 		// Query the number of attached shaders
 		GLint numShaders = 0;
 		glGetProgramiv(handle, GL_ATTACHED_SHADERS, &numShaders);
@@ -35,6 +37,7 @@ GLSLProgram::~GLSLProgram()
 
 		// Delete the program
 		glDeleteProgram(handle);
+		handle = 0;
 
 		delete[] shaderNames;
 	}

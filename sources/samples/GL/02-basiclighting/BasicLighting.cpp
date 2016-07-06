@@ -38,8 +38,8 @@ class BasicLighting : public dot::core::Application
 {
 public:
 	BasicLighting() : Application()
-	, mDiffuseProgram()
-	, mPhongProgram()
+	, mDiffuseProgram(nullptr)
+	, mPhongProgram(nullptr)
 	, mActiveProgram(nullptr)
 	, mTorus(nullptr)
 	, mAngleY(0.0f)
@@ -64,8 +64,8 @@ public:
 
 		InitScene();
 
-		//mActiveProgram = &mDiffuseProgram;
-		mActiveProgram = &mPhongProgram;
+		//mActiveProgram = mDiffuseProgram;
+		mActiveProgram = mPhongProgram;
 		mActiveProgram->Use();
 
 		glEnable(GL_DEPTH_TEST);
@@ -91,6 +91,17 @@ public:
 
 	virtual int Shutdown() OVERRIDE
 	{
+		if (mDiffuseProgram != nullptr)
+		{
+			delete mDiffuseProgram;
+			mDiffuseProgram = nullptr;
+		}
+		if (mPhongProgram != nullptr)
+		{
+			delete mPhongProgram;
+			mPhongProgram = nullptr;
+		}
+
 		return 0;
 	}
 
@@ -105,18 +116,20 @@ private:
 	void LoadShaders()
 	{
 		// diffuse lighting shaders
-		mDiffuseProgram.CompileShaderFromFile("shaders/GL/basiclighting/diffuse.vert");
-		mDiffuseProgram.CompileShaderFromFile("shaders/GL/basiclighting/diffuse.frag");
-		mDiffuseProgram.Link();
-		mDiffuseProgram.PrintActiveUniforms();
-		mDiffuseProgram.PrintActiveUniformBlocks();
+		mDiffuseProgram = new dot::gl::samples::GLSLProgram();
+		mDiffuseProgram->CompileShaderFromFile("shaders/GL/basiclighting/diffuse.vert");
+		mDiffuseProgram->CompileShaderFromFile("shaders/GL/basiclighting/diffuse.frag");
+		mDiffuseProgram->Link();
+		mDiffuseProgram->PrintActiveUniforms();
+		mDiffuseProgram->PrintActiveUniformBlocks();
 
 		// phong lighting shaders
-		mPhongProgram.CompileShaderFromFile("shaders/GL/basiclighting/phong.vert");
-		mPhongProgram.CompileShaderFromFile("shaders/GL/basiclighting/phong.frag");
-		mPhongProgram.Link();
-		mPhongProgram.PrintActiveUniforms();
-		mPhongProgram.PrintActiveUniformBlocks();
+		mPhongProgram = new dot::gl::samples::GLSLProgram();
+		mPhongProgram->CompileShaderFromFile("shaders/GL/basiclighting/phong.vert");
+		mPhongProgram->CompileShaderFromFile("shaders/GL/basiclighting/phong.frag");
+		mPhongProgram->Link();
+		mPhongProgram->PrintActiveUniforms();
+		mPhongProgram->PrintActiveUniformBlocks();
 	}
 
 	void InitScene()
@@ -157,9 +170,8 @@ private:
 	}
 
 private:
-	dot::gl::samples::GLSLProgram mDiffuseProgram;
-	dot::gl::samples::GLSLProgram mPhongProgram;
-
+	dot::gl::samples::GLSLProgram *mDiffuseProgram;
+	dot::gl::samples::GLSLProgram *mPhongProgram;
 	dot::gl::samples::GLSLProgram *mActiveProgram;
 
 	dot::gl::samples::Torus *mTorus;
