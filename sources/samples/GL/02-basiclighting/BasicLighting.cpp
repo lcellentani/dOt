@@ -37,7 +37,13 @@ public:
 class BasicLighting : public dot::core::Application
 {
 public:
-	BasicLighting() : Application(), mDiffuseProgram(), mTorus(nullptr), mAngleY(0.0f) {}
+	BasicLighting() : Application()
+	, mDiffuseProgram()
+	, mPhongProgram()
+	, mActiveProgram(nullptr)
+	, mTorus(nullptr)
+	, mAngleY(0.0f)
+	{}
 
 	//@note: this is to prevent compiling warning C4316
 	void* operator new(size_t i)
@@ -57,6 +63,10 @@ public:
 		LoadShaders();
 
 		InitScene();
+
+		//mActiveProgram = &mDiffuseProgram;
+		mActiveProgram = &mPhongProgram;
+		mActiveProgram->Use();
 
 		glEnable(GL_DEPTH_TEST);
 	}
@@ -98,9 +108,15 @@ private:
 		mDiffuseProgram.CompileShaderFromFile("shaders/GL/basiclighting/diffuse.vert");
 		mDiffuseProgram.CompileShaderFromFile("shaders/GL/basiclighting/diffuse.frag");
 		mDiffuseProgram.Link();
-		mDiffuseProgram.Use();
 		mDiffuseProgram.PrintActiveUniforms();
 		mDiffuseProgram.PrintActiveUniformBlocks();
+
+		// phong lighting shaders
+		mPhongProgram.CompileShaderFromFile("shaders/GL/basiclighting/phong.vert");
+		mPhongProgram.CompileShaderFromFile("shaders/GL/basiclighting/phong.frag");
+		mPhongProgram.Link();
+		mPhongProgram.PrintActiveUniforms();
+		mPhongProgram.PrintActiveUniformBlocks();
 	}
 
 	void InitScene()
@@ -120,21 +136,31 @@ private:
 			mAngleY -= 360.0f;
 		}
 
+		vec4 worldLight = vec4(5.0f, 5.0f, 2.0f, 1.0f);
 		model = mat4(1.0f);
 		model *= glm::rotate(glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
 		model *= glm::rotate(glm::radians(mAngleY), vec3(0.0f, 1.0f, 0.0f));
 
 		mat4 mv = view * model;
-		mDiffuseProgram.SetUniform("ModelViewMatrix", mv);
-		mDiffuseProgram.SetUniform("NormalMatrix", mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
-		mDiffuseProgram.SetUniform("MVP", projection * mv);
-		mDiffuseProgram.SetUniform("Kd", 0.9f, 0.5f, 0.3f);
-		mDiffuseProgram.SetUniform("Ld", 1.0f, 1.0f, 1.0f);
-		mDiffuseProgram.SetUniform("LightPosition", view * vec4(5.0f, 5.0f, 2.0f, 1.0f));
+
+		mActiveProgram->SetUniform("ModelViewMatrix", mv);
+		mActiveProgram->SetUniform("NormalMatrix", mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+		mActiveProgram->SetUniform("MVP", projection * mv);
+		mActiveProgram->SetUniform("Light.Position", view * worldLight);
+		mActiveProgram->SetUniform("Material.Kd", 0.9f, 0.5f, 0.3f);
+		mActiveProgram->SetUniform("Light.Ld", 1.0f, 1.0f, 1.0f);
+		mActiveProgram->SetUniform("Material.Ka", 0.9f, 0.5f, 0.3f);
+		mActiveProgram->SetUniform("Light.La", 0.4f, 0.4f, 0.4f);
+		mActiveProgram->SetUniform("Material.Ks", 0.8f, 0.8f, 0.8f);
+		mActiveProgram->SetUniform("Light.Ls", 1.0f, 1.0f, 1.0f);
+		mActiveProgram->SetUniform("Material.Shininess", 100.0f);
 	}
 
 private:
 	dot::gl::samples::GLSLProgram mDiffuseProgram;
+	dot::gl::samples::GLSLProgram mPhongProgram;
+
+	dot::gl::samples::GLSLProgram *mActiveProgram;
 
 	dot::gl::samples::Torus *mTorus;
 

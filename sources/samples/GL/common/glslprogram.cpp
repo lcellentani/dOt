@@ -320,13 +320,21 @@ void GLSLProgram::PrintActiveUniforms()
 
 	name = new GLchar[maxLen];
 
-	LOGI("Active uniforms:");
-	LOGI("------------------------------------------------");
-	for (int i = 0; i < nUniforms; ++i)
+	if (numUniforms > 0)
 	{
-		glGetActiveUniform(handle, i, maxLen, &written, &size, &type, name);
-		location = glGetUniformLocation(handle, name);
-		LOGI(" %-5d %s (%s)", location, name, getTypeString(type));
+		LOGI("Active uniforms:");
+		LOGI("------------------------------------------------");
+		for (int i = 0; i < nUniforms; ++i)
+		{
+			glGetActiveUniform(handle, i, maxLen, &written, &size, &type, name);
+			location = glGetUniformLocation(handle, name);
+			LOGI(" %-5d %s (%s)", location, name, getTypeString(type));
+		}
+		LOGI("------------------------------------------------");
+	}
+	else
+	{
+		LOGI("Active uniforms: NONE");
 	}
 
 	delete[] name;
@@ -337,19 +345,27 @@ void GLSLProgram::PrintActiveUniforms()
 
 	GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_BLOCK_INDEX };
 
-	LOGI("Active uniforms:");
-	LOGI("------------------------------------------------");
-	for (int i = 0; i < numUniforms; ++i)
+	if (numUniforms > 0)
 	{
-		GLint results[4];
-		glGetProgramResourceiv(handle, GL_UNIFORM, i, 4, properties, 4, NULL, results);
+		LOGI("Active uniforms:");
+		LOGI("------------------------------------------------");
+		for (int i = 0; i < numUniforms; ++i)
+		{
+			GLint results[4];
+			glGetProgramResourceiv(handle, GL_UNIFORM, i, 4, properties, 4, NULL, results);
 
-		if (results[3] != -1) continue;  // Skip uniforms in blocks
-		GLint nameBufSize = results[0] + 1;
-		char * name = new char[nameBufSize];
-		glGetProgramResourceName(handle, GL_UNIFORM, i, nameBufSize, NULL, name);
-		LOGI("%-5d %s (%s)", results[2], name, GetTypeString(results[1]));
-		delete[] name;
+			if (results[3] != -1) continue;  // Skip uniforms in blocks
+			GLint nameBufSize = results[0] + 1;
+			char * name = new char[nameBufSize];
+			glGetProgramResourceName(handle, GL_UNIFORM, i, nameBufSize, NULL, name);
+			LOGI("%-5d %s (%s)", results[2], name, GetTypeString(results[1]));
+			delete[] name;
+		}
+		LOGI("------------------------------------------------");
+	}
+	else
+	{
+		LOGI("Active uniforms: NONE");
 	}
 #endif
 }
@@ -367,31 +383,40 @@ void GLSLProgram::PrintActiveUniformBlocks()
 	GLchar * uniName = new GLchar[maxUniLen];
 	name = new GLchar[maxLength];
 
-	LOGI("Active Uniform blocks:");
-	LOGI("------------------------------------------------");
-	for (int i = 0; i < nBlocks; i++)
+	if (numBlocks > 0)
 	{
-		glGetActiveUniformBlockName(handle, i, maxLength, &written, name);
-		glGetActiveUniformBlockiv(handle, i, GL_UNIFORM_BLOCK_BINDING, &binding);
-		LOGI("Uniform block \"%s\" (%d):", name, binding);
-
-		GLint nUnis;
-		glGetActiveUniformBlockiv(handle, i, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &nUnis);
-		GLint *unifIndexes = new GLint[nUnis];
-		glGetActiveUniformBlockiv(handle, i, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, unifIndexes);
-
-		for (int unif = 0; unif < nUnis; ++unif)
+		LOGI("Active Uniform blocks:");
+		LOGI("------------------------------------------------");
+		for (int i = 0; i < nBlocks; i++)
 		{
-			GLint uniIndex = unifIndexes[unif];
-			GLint size;
-			GLenum type;
+			glGetActiveUniformBlockName(handle, i, maxLength, &written, name);
+			glGetActiveUniformBlockiv(handle, i, GL_UNIFORM_BLOCK_BINDING, &binding);
+			LOGI("Uniform block \"%s\" (%d):", name, binding);
 
-			glGetActiveUniform(handle, uniIndex, maxUniLen, &written, &size, &type, uniName);
-			LOGI("    %s (%s)", name, getTypeString(type));
+			GLint nUnis;
+			glGetActiveUniformBlockiv(handle, i, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &nUnis);
+			GLint *unifIndexes = new GLint[nUnis];
+			glGetActiveUniformBlockiv(handle, i, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, unifIndexes);
+
+			for (int unif = 0; unif < nUnis; ++unif)
+			{
+				GLint uniIndex = unifIndexes[unif];
+				GLint size;
+				GLenum type;
+
+				glGetActiveUniform(handle, uniIndex, maxUniLen, &written, &size, &type, uniName);
+				LOGI("    %s (%s)", name, getTypeString(type));
+			}
+
+			delete[] unifIndexes;
 		}
-
-		delete[] unifIndexes;
+		LOGI("------------------------------------------------");
 	}
+	else
+	{
+		LOGI("Active Uniform blocks: NONE");
+	}
+
 	delete[] name;
 	delete[] uniName;
 #else
@@ -402,36 +427,44 @@ void GLSLProgram::PrintActiveUniformBlocks()
 	GLenum blockIndex[] = { GL_ACTIVE_VARIABLES };
 	GLenum props[] = { GL_NAME_LENGTH, GL_TYPE, GL_BLOCK_INDEX };
 
-	LOGI("Active Uniform blocks:");
-	LOGI("------------------------------------------------");
-	for (int block = 0; block < numBlocks; ++block)
+	if (numBlocks > 0)
 	{
-		GLint blockInfo[2];
-		glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, block, 2, blockProps, 2, NULL, blockInfo);
-		GLint numUnis = blockInfo[0];
-
-		char * blockName = new char[blockInfo[1] + 1];
-		glGetProgramResourceName(handle, GL_UNIFORM_BLOCK, block, blockInfo[1] + 1, NULL, blockName);
-		LOGI("Uniform block \"%s\":", blockName);
-		delete[] blockName;
-
-		GLint * unifIndexes = new GLint[numUnis];
-		glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, block, 1, blockIndex, numUnis, NULL, unifIndexes);
-
-		for (int unif = 0; unif < numUnis; ++unif)
+		LOGI("Active Uniform blocks:");
+		LOGI("------------------------------------------------");
+		for (int block = 0; block < numBlocks; ++block)
 		{
-			GLint uniIndex = unifIndexes[unif];
-			GLint results[3];
-			glGetProgramResourceiv(handle, GL_UNIFORM, uniIndex, 3, props, 3, NULL, results);
+			GLint blockInfo[2];
+			glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, block, 2, blockProps, 2, NULL, blockInfo);
+			GLint numUnis = blockInfo[0];
 
-			GLint nameBufSize = results[0] + 1;
-			char * name = new char[nameBufSize];
-			glGetProgramResourceName(handle, GL_UNIFORM, uniIndex, nameBufSize, NULL, name);
-			LOGI("    %s (%s)", name, GetTypeString(results[1]));
-			delete[] name;
+			char * blockName = new char[blockInfo[1] + 1];
+			glGetProgramResourceName(handle, GL_UNIFORM_BLOCK, block, blockInfo[1] + 1, NULL, blockName);
+			LOGI("Uniform block \"%s\":", blockName);
+			delete[] blockName;
+
+			GLint * unifIndexes = new GLint[numUnis];
+			glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, block, 1, blockIndex, numUnis, NULL, unifIndexes);
+
+			for (int unif = 0; unif < numUnis; ++unif)
+			{
+				GLint uniIndex = unifIndexes[unif];
+				GLint results[3];
+				glGetProgramResourceiv(handle, GL_UNIFORM, uniIndex, 3, props, 3, NULL, results);
+
+				GLint nameBufSize = results[0] + 1;
+				char * name = new char[nameBufSize];
+				glGetProgramResourceName(handle, GL_UNIFORM, uniIndex, nameBufSize, NULL, name);
+				LOGI("    %s (%s)", name, GetTypeString(results[1]));
+				delete[] name;
+			}
+
+			delete[] unifIndexes;
 		}
-
-		delete[] unifIndexes;
+		LOGI("------------------------------------------------");
+	}
+	else
+	{
+		LOGI("Active Uniform blocks: NONE");
 	}
 #endif
 }
@@ -456,6 +489,7 @@ void GLSLProgram::PrintActiveAttribs()
 		location = glGetAttribLocation(handle, name);
 		LOGI(" %-5d %s (%s)", location, name, getTypeString(type));
 	}
+	LOGI("------------------------------------------------");
 	delete[] name;
 #else
 	// >= OpenGL 4.3, use glGetProgramResource
@@ -477,6 +511,7 @@ void GLSLProgram::PrintActiveAttribs()
 		LOGI("%-5d %s (%s)", results[2], name, GetTypeString(results[1]));
 		delete[] name;
 	}
+	LOGI("------------------------------------------------");
 #endif
 }
 
