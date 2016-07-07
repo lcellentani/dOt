@@ -75,8 +75,8 @@ public:
 private:
 	void LoadShaders()
 	{
-		mProg.CompileShaderFromFile("shaders/GL/uniformblock/basic_uniformblock.vert");
-		mProg.CompileShaderFromFile("shaders/GL/uniformblock/basic_uniformblock.frag");
+		mProg.CompileShaderFromFile("shaders/GL/e01-uniformblock/basic_uniformblock.vert");
+		mProg.CompileShaderFromFile("shaders/GL/e01-uniformblock/basic_uniformblock.frag");
 		mProg.Link();
 		mProg.Use();
 

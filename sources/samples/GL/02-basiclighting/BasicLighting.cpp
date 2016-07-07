@@ -108,6 +108,11 @@ public:
 			delete mFlatProgram;
 			mFlatProgram = nullptr;
 		}
+		if (mTorus != nullptr)
+		{
+			delete mTorus;
+			mTorus = nullptr;
+		}
 		return 0;
 	}
 
@@ -123,24 +128,24 @@ private:
 	{
 		// diffuse lighting shaders
 		mDiffuseProgram = new dot::gl::samples::GLSLProgram();
-		mDiffuseProgram->CompileShaderFromFile("shaders/GL/basiclighting/diffuse.vert");
-		mDiffuseProgram->CompileShaderFromFile("shaders/GL/basiclighting/diffuse.frag");
+		mDiffuseProgram->CompileShaderFromFile("shaders/GL/e02-basiclighting/diffuse.vert");
+		mDiffuseProgram->CompileShaderFromFile("shaders/GL/e02-basiclighting/diffuse.frag");
 		mDiffuseProgram->Link();
 		mDiffuseProgram->PrintActiveUniforms("diffuse");
 		mDiffuseProgram->PrintActiveUniformBlocks("diffuse");
 
 		// phong lighting shaders
 		mPhongProgram = new dot::gl::samples::GLSLProgram();
-		mPhongProgram->CompileShaderFromFile("shaders/GL/basiclighting/phong.vert");
-		mPhongProgram->CompileShaderFromFile("shaders/GL/basiclighting/phong.frag");
+		mPhongProgram->CompileShaderFromFile("shaders/GL/e02-basiclighting/phong.vert");
+		mPhongProgram->CompileShaderFromFile("shaders/GL/e02-basiclighting/phong.frag");
 		mPhongProgram->Link();
 		mPhongProgram->PrintActiveUniforms("phong");
 		mPhongProgram->PrintActiveUniformBlocks("phong");
 
 		// flat lighting shaders
 		mFlatProgram = new dot::gl::samples::GLSLProgram();
-		mFlatProgram->CompileShaderFromFile("shaders/GL/basiclighting/flat.vert");
-		mFlatProgram->CompileShaderFromFile("shaders/GL/basiclighting/flat.frag");
+		mFlatProgram->CompileShaderFromFile("shaders/GL/e02-basiclighting/flat.vert");
+		mFlatProgram->CompileShaderFromFile("shaders/GL/e02-basiclighting/flat.frag");
 		mFlatProgram->Link();
 		mFlatProgram->PrintActiveUniforms("flat");
 		mFlatProgram->PrintActiveUniformBlocks("flat");

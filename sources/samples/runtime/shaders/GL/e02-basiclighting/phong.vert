@@ -64,5 +64,6 @@ void main()
 
 	// Evaluate the lighting equation.
     LightIntensity = phongModel(eyePosition, eyeNormal);
+
     gl_Position = MVP * vec4(VertexPosition, 1.0);
 }
