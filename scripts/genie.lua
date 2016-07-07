@@ -140,6 +140,7 @@ exampleProject("01-uniformblock", "GL", "gl-examples-common")
 exampleProject("02-basiclighting", "GL", "gl-examples-common")
 exampleProject("03-twosidelighting", "GL", "gl-examples-common")
 exampleProject("04-subroutines", "GL", "gl-examples-common")
+exampleProject("05-spotlights", "GL", "gl-examples-common")
 
 
 

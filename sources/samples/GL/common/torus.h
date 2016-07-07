@@ -2,7 +2,6 @@
 #define __DOT_SAMPLES_TORUS_H_HEADER_GUARD__
 
 #include "drawable.h"
-
 #include <stdint.h> // uint32_t
 
 namespace dot
