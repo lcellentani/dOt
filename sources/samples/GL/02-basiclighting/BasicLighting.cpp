@@ -41,6 +41,8 @@ public:
 	, mDiffuseProgram(nullptr)
 	, mPhongProgram(nullptr)
 	, mFlatProgram(nullptr)
+	, mPPPhongProgram(nullptr)
+	, mPPPhongHalfVecProgram(nullptr)
 	, mActiveProgram(nullptr)
 	, mTorus(nullptr)
 	, mAngleY(0.0f)
@@ -66,8 +68,10 @@ public:
 		InitScene();
 
 		//mActiveProgram = mDiffuseProgram;
-		mActiveProgram = mPhongProgram;
+		//mActiveProgram = mPhongProgram;
 		//mActiveProgram = mFlatProgram;
+		//mActiveProgram = mPPPhongProgram;
+		mActiveProgram = mPPPhongHalfVecProgram;
 		mActiveProgram->Use();
 
 		glEnable(GL_DEPTH_TEST);
@@ -107,6 +111,16 @@ public:
 		{
 			delete mFlatProgram;
 			mFlatProgram = nullptr;
+		}
+		if (mPPPhongProgram != nullptr)
+		{
+			delete mPPPhongProgram;
+			mPPPhongProgram = nullptr;
+		}
+		if (mPPPhongHalfVecProgram != nullptr)
+		{
+			delete mPPPhongHalfVecProgram;
+			mPPPhongHalfVecProgram = nullptr;
 		}
 		if (mTorus != nullptr)
 		{
@@ -149,6 +163,22 @@ private:
 		mFlatProgram->Link();
 		mFlatProgram->PrintActiveUniforms("flat");
 		mFlatProgram->PrintActiveUniformBlocks("flat");
+
+		// phong lighting shaders
+		mPPPhongProgram = new dot::gl::samples::GLSLProgram();
+		mPPPhongProgram->CompileShaderFromFile("shaders/GL/e02-basiclighting/perpixelphong.vert");
+		mPPPhongProgram->CompileShaderFromFile("shaders/GL/e02-basiclighting/perpixelphong.frag");
+		mPPPhongProgram->Link();
+		mPPPhongProgram->PrintActiveUniforms("pp-phong");
+		mPPPhongProgram->PrintActiveUniformBlocks("pp-phong");
+
+		// phong lighting shaders
+		mPPPhongHalfVecProgram = new dot::gl::samples::GLSLProgram();
+		mPPPhongHalfVecProgram->CompileShaderFromFile("shaders/GL/e02-basiclighting/perpixelphong.vert");
+		mPPPhongHalfVecProgram->CompileShaderFromFile("shaders/GL/e02-basiclighting/perpixelphong-halfvec.frag");
+		mPPPhongHalfVecProgram->Link();
+		mPPPhongHalfVecProgram->PrintActiveUniforms("pp-phong-half");
+		mPPPhongHalfVecProgram->PrintActiveUniformBlocks("pp-phong-half");
 	}
 
 	void InitScene()
@@ -197,6 +227,8 @@ private:
 	dot::gl::samples::GLSLProgram *mDiffuseProgram;
 	dot::gl::samples::GLSLProgram *mPhongProgram;
 	dot::gl::samples::GLSLProgram *mFlatProgram;
+	dot::gl::samples::GLSLProgram *mPPPhongProgram;
+	dot::gl::samples::GLSLProgram *mPPPhongHalfVecProgram;
 	dot::gl::samples::GLSLProgram *mActiveProgram;
 
 	dot::gl::samples::Torus *mTorus;
